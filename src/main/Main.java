@@ -3,7 +3,7 @@ import java.util.*;
 //import java.io.*;
 public class Main {
 	
-	public static void main(String[] args) {
+	public static void main(String[] args){
 		LocationDataPoint test = new LocationDataPoint();
 		HashMap<String, LocationDataPoint> JAVAdataset= test.createDataset("ucur","July");
 		JAVAdataset = test.addDataset("vcur", "July",JAVAdataset);
@@ -26,7 +26,6 @@ public class Main {
 			listLon.add(lon);	
 		}
 		*/
-		Search testSearch = new Search();
-		testSearch.aStar(JAVAdataset.get("57.5, 322.5"), JAVAdataset.get("34.5, 140.5"), JAVAdataset, "Time", 20000e3 , 50.);
+		new Search().aStar(JAVAdataset.get("57.5, 322.5"), JAVAdataset.get("34.5, 140.5"), JAVAdataset, "Water", 4270290., 2);
 	}
 }

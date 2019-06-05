@@ -14,6 +14,8 @@ public class LocationDataPoint {
 	double f = Double.MAX_VALUE;
 	double g = Double.MAX_VALUE;
 	double h;
+	Iceberg iceberg;
+	double time;
 	HashMap<LocationDataPoint, Double> NeighborsF;
 	HashMap<LocationDataPoint, Double> NeighborsG;
 	
@@ -50,6 +52,12 @@ public class LocationDataPoint {
 	public HashMap<LocationDataPoint, Double> getNeighborsG() {
 		return NeighborsG;
 	}
+	public Iceberg getIceberg() {
+		return iceberg;
+	}
+	public double getTime() {
+		return time;
+	}
 	private void setLat(double newValue) {
 		lat = newValue;
 	}
@@ -79,6 +87,12 @@ public class LocationDataPoint {
 	}
 	public void setNeighborsG(HashMap<LocationDataPoint, Double> newValue) {
 		NeighborsG = newValue;
+	}
+	public void setIceberg(Iceberg newIceberg) {
+		iceberg = newIceberg;
+	}
+	public void setTime(double newValue) {
+		time = newValue;
 	}
 	private void createNeighbors(HashMap<String, LocationDataPoint> dataset) {
 		Set<String> keys = dataset.keySet();

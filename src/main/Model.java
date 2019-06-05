@@ -1,7 +1,11 @@
 package main;
 
 public class Model {
-	protected double CalcTime(double boatPower, double icebergSize, LocationDataPoint from, LocationDataPoint to) {
+/*
+ * Formulas based on "Validation and Quantitative Assessment of the Deterioration Mechanisms of ArcticIcebergs
+ * El-Tahan, M.S., Venkatesh, S., El-Tahan, H., 1987. 
+ */
+	protected double CalcTime(double boatForce, Iceberg iceberg, LocationDataPoint from, LocationDataPoint to) {
 		//U = E-W
 		//V = N-S
 		double lat1 = from.getLat();
@@ -14,31 +18,140 @@ public class Model {
 		double curPerpendicular = ucur*Math.cos(bearing) + vcur*Math.sin(bearing);
 		double curParallel = ucur*Math.sin(bearing) + vcur*Math.cos(bearing);
 		double distance = CalcDistance(lat1, lon1, lat2, lon2);
-		double radius = icebergSize;
-		double forceDragFactor = .5*997*.47*Math.PI*Math.pow(radius, 2);
-		
-		double boatPowerPerpendicular = forceDragFactor*Math.pow(curPerpendicular, 3);
-		double boatPowerParallel = boatPower - boatPowerPerpendicular;
-		if (boatPowerParallel <= 0) {
-			System.out.println("Error: Boat does not have enough power");
+		double icebergLength = iceberg.getLength();
+		double icebergWidth = iceberg.getWidth();
+		double icebergHeight = iceberg.getHeight();
+		if (icebergLength <= 0) {
+			return Double.MAX_VALUE;
 		}
-		double realVelocity = SolveThirdDegree(1,
-											   -3*curParallel,
-					                           3*Math.pow(curParallel, 2),
-					                           -Math.pow(curParallel, 3) - (boatPowerParallel/forceDragFactor));
 		
-		double time = distance / realVelocity;
+		double boatForcePerpendicular = .5*1029*.9*icebergLength*icebergHeight*Math.pow(curPerpendicular, 2);
+		double boatForceParallel = boatForce - boatForcePerpendicular;
+		if (boatForceParallel <= 0) {
+			return Double.MAX_VALUE;
+		}
+		
+		double relativeVelocity = Math.sqrt(boatForceParallel/(.5*1029*.9*icebergWidth*icebergHeight));
+		double icebergVelocity = Math.abs(relativeVelocity - curParallel);
+		double time = distance / icebergVelocity;
 		return time;
-			
 	}
-	protected double SolveThirdDegree(double a, double b, double c, double d) {
-		double alpha = (-Math.pow(b,3))/(27*Math.pow(a,3)) + (b*c)/(6*a*a) - d/(2*a);
-		double beta = c/(3*a) - (Math.pow(b,2))/(9*a*a);
-		double gamma = b/(3*a);
-		double x = Math.cbrt(alpha + Math.sqrt(Math.pow(alpha, 2) + Math.pow(beta, 3))) + Math.cbrt(alpha - Math.sqrt(Math.pow(alpha, 2) + Math.pow(beta, 3))) - gamma;
-		return x;
+	
+	protected double CalcIcebergSize(double boatForce, Iceberg iceberg, LocationDataPoint from, LocationDataPoint to) {
+		//U = E-W
+		//V = N-S
+		double lat1 = from.getLat();
+		double lat2 = to.getLat();
+		double lon1 = from.getLon();
+		double lon2 = to.getLon();
+		double ucur = (from.getUcur() + to.getUcur())/2;
+		double vcur = (from.getVcur() + to.getVcur())/2;
+		double bearing = CalcBearing(lat1, lon1, lat2, lon2);
+		double curPerpendicular = ucur*Math.cos(bearing) + vcur*Math.sin(bearing);
+		double curParallel = ucur*Math.sin(bearing) + vcur*Math.cos(bearing);
+		double distance = CalcDistance(lat1, lon1, lat2, lon2);
+		double icebergLength = iceberg.getLength();
+		double icebergWidth = iceberg.getWidth();
+		double icebergHeight = iceberg.getHeight();
+		if (icebergLength <= 0) {
+			return Double.MAX_VALUE;
+		}
+		
+		double boatForcePerpendicular = .5*1029*.9*icebergLength*icebergHeight*Math.pow(curPerpendicular, 2);
+		double boatForceParallel = boatForce - boatForcePerpendicular;
+		if (boatForceParallel <= 0) {
+			return Double.MAX_VALUE;
+		}
+		
+		double relativeVelocity = Math.sqrt(boatForceParallel/(.5*1029*.9*icebergWidth*icebergHeight));
+		double icebergVelocity = Math.abs(relativeVelocity - curParallel);
+		double time = distance / icebergVelocity;
+		double sst = (to.getSst() + from.getSst())/2;
+		
+		//Solar Radiation
+		double insolation = Double.NaN; // Solar Energy per Area W/m^2
+		double averageLat = (lat1 + lat2)/2;
+		if (averageLat >= 85) {
+			insolation = 3160;
+		}
+		else if (averageLat >= 75 && averageLat < 85) {
+			insolation = 4013;
+		}
+		else if (averageLat >= 65 && averageLat < 75) {
+			insolation = 4745;
+		}
+		else if (averageLat >= 55 && averageLat < 65) {
+			insolation = 5613;
+		}
+		else if (averageLat >= 45 && averageLat < 55) {
+			insolation = 6743;
+		}
+		else if (averageLat >= 35 && averageLat < 45) {
+			insolation = 7828;
+		}
+		else if (averageLat >= 25 && averageLat < 35) {
+			insolation = 8698;
+		}
+		else if (averageLat >= 15 && averageLat < 25) {
+			insolation = 9403;
+		}
+		else if (averageLat >= 5 && averageLat < 15) {
+			insolation = 9825;
+		}
+		else if (averageLat >= -5 && averageLat < 5) {
+			insolation = 9950;
+		}
+		else if (averageLat >= -15 && averageLat < -5) {
+			insolation = 9865;
+		}
+		else if (averageLat >= -25 && averageLat < -15) {
+			insolation = 9480;
+		}
+		else if (averageLat >= -35 && averageLat < -25) {
+			insolation = 8808;
+		}
+		else if (averageLat >= -45 && averageLat < -35) {
+			insolation = 7968;
+		}
+		else if (averageLat >= -55 && averageLat < -45) {
+			insolation = 6910;
+		}
+		else if (averageLat >= -65 && averageLat < -55) {
+			insolation = 5800;
+		}
+		else if (averageLat >= -75 && averageLat < -65) {
+			insolation = 4950;
+		}
+		else if (averageLat >= -85 && averageLat < -75) {
+			insolation = 4228;
+		}
+		else if (averageLat < -85) {
+			insolation = 3378;
+		}
+		insolation = insolation*.3;
+		double kgLossSolar = insolation*icebergLength*icebergWidth/334000;
+		double volumeLossSolar = kgLossSolar/916.8*time;
+		
+		//Buoyant Vertical Convection
+		double Vmb = (2.78*sst + .47*Math.pow(sst, 2))/3.154e7;
+		double volumeLossBuoyant = Vmb*time;
+		
+		//Forced Convection
+		double Re = 916.8*Math.abs(curParallel)*icebergLength/3.09;
+		double Pr = 7.56;
+		double Nu = .055*Math.pow(Re, .8)*Math.pow(Pr, .4);
+		double qw = Nu*.6*sst/icebergLength;
+		double Vmf = qw/(916.8);
+		double volumeLossForced = Vmf*time;
+		
+		//Wave Erosion
+		double Vmw = .000146*Math.pow((.01/5),.2)*5/10;
+		double volumeLossErosion = Vmw*time*sst;
+		
+		double volumeLoss = volumeLossSolar + volumeLossBuoyant + volumeLossForced + volumeLossErosion;
+		return volumeLoss;
 	}
-
+	
 
 	protected double CalcBearing(double lat1, double lon1, double lat2, double lon2){
 		lat1 = Math.toRadians(lat1);
