@@ -175,5 +175,4 @@ public class Model {
 		double beta = 2*Math.atan2(Math.sqrt(alpha), Math.sqrt(1-alpha));
 		return r*beta;
 	}
-
 }

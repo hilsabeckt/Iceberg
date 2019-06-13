@@ -10,25 +10,30 @@ import org.json.simple.parser.*;
 public class Data_Aggregator {
 	public JSONObject openFile(String filename){
 		JSONObject dataset = new JSONObject();
+		FileReader reader = null;
 		try {
-		Object obj = new JSONParser().parse(new FileReader(filename));
-		dataset = (JSONObject) obj;
-	}
-	catch (FileNotFoundException e) {
-		e.printStackTrace();
-	} catch (IOException e) {
-		e.printStackTrace();
-	} catch (ParseException e) {
-		e.printStackTrace();
-	}
-		
+			reader = new FileReader(filename);
+			Object obj = new JSONParser().parse(reader);
+			dataset = (JSONObject) obj;
+		}
+		catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+		}
+		catch (ParseException e) {
+			e.printStackTrace();
+		}
+		finally {
+			try {
+				reader.close();
+			}
+			catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 		return dataset;
-}
-	
-	public Object convertJSONtoObj(JSONObject dataset) {
-		Object test = new Object();
-		return test;
 	}
-
 	
 }

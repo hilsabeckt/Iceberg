@@ -1,8 +1,9 @@
 package main;
 import java.util.*;
+
 public class Search extends Model{
 
-	public void aStar(LocationDataPoint startLocation, LocationDataPoint endLocation,
+	public String aStar(LocationDataPoint startLocation, LocationDataPoint endLocation,
 				      HashMap<String,LocationDataPoint> JAVAdataset, String heuristic,
 				      Double boatPower, Integer icebergSize){
 		
@@ -34,7 +35,6 @@ public class Search extends Model{
 		Iceberg miniIceberg = new Iceberg();
 		miniIceberg.setSize(1);
 		JAVAdataset.forEach((key,datapoint)->{
-			//datapoint.setH(CalcTime(boatPower, miniIceberg, datapoint, endLocation));
 			datapoint.setH(0);
 		});
 		
@@ -77,11 +77,27 @@ public class Search extends Model{
 			}
 		}
 		List<LocationDataPoint> pathList = assemblePath(endLocation,path);
-
-		System.out.println("Size of PathList: " + pathList.size());
-		System.out.println("Start Size of Iceberg: " + startIceberg.getMass());
-		System.out.println("Final Size of Iceberg: " + endLocation.getIceberg().getMass());
-		System.out.println("Total time: " + endLocation.getTime()/86400. + " Days");
+		
+		
+		System.out.println(heuristic + ": ");
+		System.out.printf("Start Size of Iceberg: %.2e kg %n", startIceberg.getMass());
+		System.out.printf("Final Size of Iceberg: %.2e kg %n", endLocation.getIceberg().getMass());
+		System.out.printf("Total Time: %.1f Days %n", endLocation.getTime()/86400);
+		
+		StringBuilder htmlList = new StringBuilder();
+		for (int i = 0 ; i < pathList.size(); i++) {
+			htmlList.append("\t\t\t{lat: ");
+			htmlList.append(pathList.get(i).getLat());
+			htmlList.append(", lng: ");
+			double lon = pathList.get(i).getLon();
+			if(lon>180) {
+				lon = lon - 360;
+			}
+			htmlList.append(lon);
+			htmlList.append("},");
+			htmlList.append(System.lineSeparator());
+		}
+		return htmlList.toString();
 	}
 
 	private List<LocationDataPoint> assemblePath(LocationDataPoint endLocation, Map<LocationDataPoint, LocationDataPoint> path) {
@@ -93,21 +109,6 @@ public class Search extends Model{
 		}
 		
 		Collections.reverse(pathList);
-		
-		System.out.println("Lat: ");
-		pathList.forEach((point)->{	
-			double lat = point.getLat();
-			System.out.println(lat);
-		});
-		
-		System.out.println("Lon: ");
-		pathList.forEach((point)->{	
-			double lon = point.getLon();
-			if(lon>180) {
-				lon = lon-360;
-			}
-			System.out.println(lon);
-		});
 		
 		return pathList;
 	}
