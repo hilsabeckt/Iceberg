@@ -6,8 +6,6 @@ public class Model {
  * El-Tahan, M.S., Venkatesh, S., El-Tahan, H., 1987. 
  */
 	protected double CalcTime(double boatForce, Iceberg iceberg, LocationDataPoint from, LocationDataPoint to) {
-		//U = E-W
-		//V = N-S
 		double lat1 = from.getLat();
 		double lat2 = to.getLat();
 		double lon1 = from.getLon();
@@ -38,8 +36,6 @@ public class Model {
 	}
 	
 	protected double CalcIcebergSize(double boatForce, Iceberg iceberg, LocationDataPoint from, LocationDataPoint to) {
-		//U = E-W
-		//V = N-S
 		double lat1 = from.getLat();
 		double lat2 = to.getLat();
 		double lon1 = from.getLon();
@@ -153,7 +149,7 @@ public class Model {
 	}
 	
 
-	protected double CalcBearing(double lat1, double lon1, double lat2, double lon2){
+	protected static double CalcBearing(double lat1, double lon1, double lat2, double lon2){
 		lat1 = Math.toRadians(lat1);
 		lat2 = Math.toRadians(lat2);
 		lon1 = Math.toRadians(lon1);
@@ -163,7 +159,7 @@ public class Model {
 		return ((Math.atan2(y, x)) + 2*Math.PI) % (2*Math.PI);
 	}
 	
-	protected double CalcDistance(double lat1, double lon1, double lat2, double lon2){
+	public static double CalcDistance(double lat1, double lon1, double lat2, double lon2){
 		double r = 6371e3;
 		double rlat1 = Math.toRadians(lat1);
 		double rlat2 = Math.toRadians(lat2);

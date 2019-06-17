@@ -5,7 +5,7 @@ public class Search extends Model{
 
 	public String aStar(LocationDataPoint startLocation, LocationDataPoint endLocation,
 				      HashMap<String,LocationDataPoint> JAVAdataset, String heuristic,
-				      Double boatPower, Integer icebergSize){
+				      Double boatPower, Integer icebergSize) throws NullPointerException{
 		
 
 		Set<LocationDataPoint> closedPoints = new HashSet<LocationDataPoint>();
@@ -78,11 +78,21 @@ public class Search extends Model{
 		}
 		List<LocationDataPoint> pathList = assemblePath(endLocation,path);
 		
+		Double startSize = startIceberg.getMass();
+		Double endSize = endLocation.getIceberg().getMass();
+		Double totalTime = endLocation.getTime()/86400;
 		
-		System.out.println(heuristic + ": ");
-		System.out.printf("Start Size of Iceberg: %.2e kg %n", startIceberg.getMass());
-		System.out.printf("Final Size of Iceberg: %.2e kg %n", endLocation.getIceberg().getMass());
-		System.out.printf("Total Time: %.1f Days %n", endLocation.getTime()/86400);
+		String color = "";
+		if (heuristic == "Water") {
+			color = "(White)";
+		}
+		else if (heuristic == "Time") {
+			color = "(Yellow)";
+		}		
+		System.out.println(heuristic + ": " + color);
+		System.out.printf("Start Size of Iceberg: %.2e kg %n", startSize);
+		System.out.printf("Final Size of Iceberg: %.2e kg %n", endSize);
+		System.out.printf("Total Time: %.1f Days %n", totalTime);
 		
 		StringBuilder htmlList = new StringBuilder();
 		for (int i = 0 ; i < pathList.size(); i++) {
