@@ -5,6 +5,7 @@ public class Model {
  * Formulas based on "Validation and Quantitative Assessment of the Deterioration Mechanisms of ArcticIcebergs
  * El-Tahan, M.S., Venkatesh, S., El-Tahan, H., 1987. 
  */
+	
 	protected double CalcTime(double boatForce, Iceberg iceberg, LocationDataPoint from, LocationDataPoint to) {
 		double lat1 = from.getLat();
 		double lat2 = to.getLat();

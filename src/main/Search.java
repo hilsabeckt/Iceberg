@@ -122,4 +122,100 @@ public class Search extends Model{
 		
 		return pathList;
 	}
+	
+	public static Result implementSearch(HashMap<String,LocationDataPoint> JAVAdataset,
+									   Double startLat, Double startLon, Double endLat, Double endLon,
+									   Integer numberBoats, Integer icebergClass) {
+									   
+		Double startDistance = Double.MAX_VALUE;
+		Double endDistance = Double.MAX_VALUE;
+		String start = "";
+		String end = "";
+		Double realStartLat = Double.NaN;
+		Double realStartLon = Double.NaN;
+		Double realEndLat = Double.NaN;
+		Double realEndLon = Double.NaN;
+	
+		Set<String> keySet = JAVAdataset.keySet();
+		Set<String> checked = new HashSet<>();
+		String Water = "";
+		String Time = "";
+		
+		boolean realPoint = false;
+		/*Checks to see if Start/End Location are known data points.
+		 *If not a known data point:
+		 *Find closest point in known data points to user-defined point.
+		 *If no path available from Start to End:
+		 *Find next closest data point and repeat.
+		 */
+	
+		while (!realPoint) {
+			startDistance = Double.MAX_VALUE;
+			endDistance = Double.MAX_VALUE;
+			try {
+				if (keySet.contains(startLat + ", " + startLon)) {
+					start = startLat + ", " + startLon;
+					realStartLat = startLat;
+					realStartLon = startLon;	
+				}
+				else {
+					for (String key : keySet) {
+						if (checked.contains(key)) {
+							continue;
+						}
+						Double lat2 = JAVAdataset.get(key).getLat();
+						Double lon2 = JAVAdataset.get(key).getLon();
+						Double tempDistance = Model.CalcDistance(startLat, startLon, lat2, lon2);
+						if (tempDistance < startDistance) {
+							start = key;
+							realStartLat = lat2;
+							realStartLon = lon2;
+							startDistance = tempDistance;
+						}
+					}
+				}	
+		
+				if (keySet.contains(endLat + ", " + endLon)) {
+					end = endLat + ", " + endLon;
+					realEndLat = endLat;
+					realEndLon = endLon;	
+				}
+				else {
+					for (String key : keySet) {
+						if (checked.contains(key)) {
+							continue;
+						}
+						Double lat2 = JAVAdataset.get(key).getLat();
+						Double lon2 = JAVAdataset.get(key).getLon();
+						Double tempDistance = Model.CalcDistance(endLat, endLon, lat2, lon2);
+						if (tempDistance < endDistance) {
+							end = key;
+							realEndLat = lat2;
+							realEndLon = lon2;
+							endDistance = tempDistance;
+						}
+					}
+				}
+				Water = new Search().aStar(JAVAdataset.get(start), JAVAdataset.get(end), JAVAdataset, "Water", 4270290.*numberBoats, icebergClass);
+				Time = new Search().aStar(JAVAdataset.get(start), JAVAdataset.get(end), JAVAdataset, "Time", 4270290.*numberBoats, icebergClass);
+				realPoint = true;
+			}
+			/*Catches Exception.
+			 *If Caught, this mean points do not connect (lake, sea, etc.):
+			 *Add to list of checked points and repeat.
+			 */
+			catch (Exception e) {
+				checked.add(end);
+				continue;
+			}
+		}
+		Result result = new Result();
+		result.setWaterString(Water);
+		result.setTimeString(Time);
+		result.setRealStartLat(realStartLat);
+		result.setRealStartLon(realStartLon);
+		result.setRealEndLat(realEndLat);
+		result.setRealEndLon(realEndLon);
+		return result;
+	}
 }

@@ -9,7 +9,6 @@ public class LocationDataPoint {
 	double sst = Double.NaN;
 	double ucur = Double.NaN;
 	double vcur = Double.NaN;
-	HashMap<String, LocationDataPoint> JAVAdataset;
 	HashSet<LocationDataPoint> neighbors;
 	double f = Double.MAX_VALUE;
 	double g = Double.MAX_VALUE;
@@ -162,14 +161,12 @@ public class LocationDataPoint {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public HashMap<String, LocationDataPoint> createDataset(String dataType, String month) {
+	public static HashMap<String, LocationDataPoint> createDataset(String dataType, String month) {
+		HashMap<String, LocationDataPoint> JAVAdataset = new HashMap<String, LocationDataPoint>();
 		Data_Aggregator dataset = new Data_Aggregator();
 		String filename = "data/" +dataType+"_" +month+".json";
 		JSONObject JSONdataset = dataset.openFile(filename);
 		Set<String> JSONkeys = JSONdataset.keySet();
-		if (JAVAdataset == null) {
-			JAVAdataset = new HashMap<>();
-		}
 		int n = JSONdataset.size();
 		String arr[] = new String[n];
 		for (String x : JSONkeys) {
@@ -197,7 +194,7 @@ public class LocationDataPoint {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public HashMap<String, LocationDataPoint> addDataset(String dataType, String month, HashMap<String, LocationDataPoint> JAVAdataset) {
+	public static HashMap<String, LocationDataPoint> addDataset(String dataType, String month, HashMap<String, LocationDataPoint> JAVAdataset) {
 		Data_Aggregator dataset = new Data_Aggregator();
 		String filename = "data/" +dataType+"_" +month+".json";
 		JSONObject JSONdataset = dataset.openFile(filename);
@@ -241,7 +238,7 @@ public class LocationDataPoint {
 		return JAVAdataset;
 }
 
-	public HashMap<String, LocationDataPoint> cleanDataset(HashMap<String, LocationDataPoint> JAVAdataset) {
+	public static HashMap<String, LocationDataPoint> cleanDataset(HashMap<String, LocationDataPoint> JAVAdataset) {
 		Set<String> removeList = new HashSet<String>();
 		Set<String> keys = JAVAdataset.keySet();
 		for (String x : keys) {
